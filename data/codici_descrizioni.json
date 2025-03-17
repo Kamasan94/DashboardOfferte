@@ -1,0 +1,22 @@
+[
+    {
+        "codice": "020237GSVML04XX000000000080BSG25",
+        "descrizione": "80 Family PSV"
+    },
+    {
+        "codice": "03",
+        "descrizione": "Componente di Commercializzazione quota variabile pari a 0,05 €/smc definita da 2Genergia"
+    },
+    {
+        "codice": "10",
+        "descrizione": "Componente regolata (nessuna descrizione dettagliata fornita)"
+    },
+    {
+        "codice": "01",
+        "descrizione": "Corrispettivo di commercializzazione e Vendita pari a 144 €/punto/annui (12 €/punto/mese) definito da 2G energia"
+    },
+    {
+        "codice": "04",
+        "descrizione": "Spread"
+    }
+]
