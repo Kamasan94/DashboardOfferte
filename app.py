@@ -1,5 +1,5 @@
 import json
-from dash import Dash, html, dcc, callback, Output, Input
+from dash import Dash, html, dcc, callback, Output, Input, dash_table
 import plotly.express as px
 import pandas as pd
 import xml.etree.ElementTree as ET
@@ -12,25 +12,41 @@ app = Dash()
 
 data = []
 for offerta in root.iter('offerta'):
-    company = offerta.find('IdentificativiOfferta/PIVA_UTENTE').text
-    data.append({"company": company})
+    if(offerta.find('DettaglioOfferta/TIPO_CLIENTE').text == "01"):
+        company = offerta.find('IdentificativiOfferta/PIVA_UTENTE').text
+        nomeOfferta = offerta.find('DettaglioOfferta/NOME_OFFERTA').text
+        durata = offerta.find('DettaglioOfferta/DURATA').text
+        urlOfferta = offerta.find('DettaglioOfferta/Contatti/URL_OFFERTA').text if  offerta.find('DettaglioOfferta/Contatti/URL_OFFERTA') != None else ''
+        dataInizioVal = offerta.find('ValiditaOfferta/DATA_INIZIO').text
+        dataFineVal = offerta.find('ValiditaOfferta/DATA_FINE').text
+        data.append({"Company": company, 
+                    "Nome Offerta" : nomeOfferta, 
+                    "Durata" : durata, 
+                    "URL" : urlOfferta,
+                    "Data Inizio" : dataInizioVal,
+                    "Data Fine" : dataFineVal
+                    })
     
 
 # Requires Dash 2.17.0 or later
 app.layout = [
-    html.H1(children='Title of Dash App', style={'textAlign':'center'}),
-    dcc.Dropdown(json.dumps(data), 'Company', id='dropdown-selection'),
-    dcc.Graph(id='graph-content')
+    html.H1(children='Offerte ultimo mese', style={'textAlign':'center'}),
+    dash_table.DataTable(
+        data=data,
+        page_size=30,
+        style_cell = {'text-align' : 'left'},
+        style_header={
+            'backgroundColor': 'rgb(30, 30, 30)',
+            'color': 'white'
+        },
+        style_data={
+            'backgroundColor': 'rgb(50, 50, 50)',
+            'color': 'white'
+        },
+                        
+    )
+                            
 ]
-
-@callback(
-    Output('graph-content', 'figure'),
-    Input('dropdown-selection', 'value')
-)
-
-def update_graph(value):
-    dff = df[df.country==value]
-    return px.line(dff, x='year', y='pop')
 
 # Run the app
 if __name__ == '__main__':
