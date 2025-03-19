@@ -17,14 +17,25 @@ for offerta in root.iter('offerta'):
         nomeOfferta = offerta.find('DettaglioOfferta/NOME_OFFERTA').text
         durata = offerta.find('DettaglioOfferta/DURATA').text
         urlOfferta = offerta.find('DettaglioOfferta/Contatti/URL_OFFERTA').text if  offerta.find('DettaglioOfferta/Contatti/URL_OFFERTA') != None else ''
-        dataInizioVal = offerta.find('ValiditaOfferta/DATA_INIZIO').text
-        dataFineVal = offerta.find('ValiditaOfferta/DATA_FINE').text
+        dataInizioVal = offerta.find('ValiditaOfferta/DATA_INIZIO').text.split('_')[0]
+        dataFineVal = offerta.find('ValiditaOfferta/DATA_FINE').text.split('_')[0]
+        costoKw = ''
+        for componente in offerta.findall('ComponenteImpresa'):
+            nome = componente.find('NOME').text
+            if nome == "Prezzo":
+                costoKw = f"{componente.find('IntervalloPrezzi/PREZZO').text} €/kWh"
+            if nome == "Spread" or nome == "PREZZO MATERIA PRIMA" or nome == "SPREAD" or nome == "Prezzo Componente Energia Elettricità":
+                for prezzo in componente.findall('IntervalloPrezzi'):
+                    fascia = prezzo.find('FASCIA_COMPONENTE').text
+                    costo = prezzo.find('PREZZO').text
+                    costoKw += f"Fascia {fascia}: {costo} €/kWh\n"
         data.append({"Company": company, 
                     "Nome Offerta" : nomeOfferta, 
                     "Durata" : durata, 
                     "URL" : urlOfferta,
                     "Data Inizio" : dataInizioVal,
-                    "Data Fine" : dataFineVal
+                    "Data Fine" : dataFineVal,
+                    "Costo kW" : costoKw
                     })
     
 
