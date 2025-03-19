@@ -20,22 +20,26 @@ for offerta in root.iter('offerta'):
         dataInizioVal = offerta.find('ValiditaOfferta/DATA_INIZIO').text.split('_')[0]
         dataFineVal = offerta.find('ValiditaOfferta/DATA_FINE').text.split('_')[0]
         costoKw = ''
+        costoEnergiaVerde = ''
         for componente in offerta.findall('ComponenteImpresa'):
             nome = componente.find('NOME').text
             if nome == "Prezzo":
                 costoKw = f"{componente.find('IntervalloPrezzi/PREZZO').text} €/kWh"
-            if nome == "Spread" or nome == "PREZZO MATERIA PRIMA" or nome == "SPREAD" or nome == "Prezzo Componente Energia Elettricità":
+            if "Spread" in nome or nome == "PREZZO MATERIA PRIMA" or nome == "SPREAD" or nome == "Prezzo Componente Energia Elettricità" or nome == "Corrispettivo al consumo" or nome == "Corrispettivo Variabile":
                 for prezzo in componente.findall('IntervalloPrezzi'):
                     fascia = prezzo.find('FASCIA_COMPONENTE').text
                     costo = prezzo.find('PREZZO').text
                     costoKw += f"Fascia {fascia}: {costo} €/kWh\n"
-        data.append({"Company": company, 
+            if nome == 'Energia Verde':
+                    costoEnergiaVerde = componente.find('IntervalloPrezzi/PREZZO').text
+        data.append({"Azienda": company, 
                     "Nome Offerta" : nomeOfferta, 
                     "Durata" : durata, 
                     "URL" : urlOfferta,
                     "Data Inizio" : dataInizioVal,
                     "Data Fine" : dataFineVal,
-                    "Costo kW" : costoKw
+                    "Costo kW" : costoKw,
+                    "Costo Energia Verde" : costoEnergiaVerde
                     })
     
 
