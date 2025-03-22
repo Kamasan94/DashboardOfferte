@@ -10,6 +10,15 @@ root = tree.getroot()
 
 app = Dash()
 
+nomiPrezzi = [
+     'MP EE DOME',
+     'PREZZO MATERIA PRIMA',
+     'Spread',
+     'Prezzo Componente Energia Elettricità',
+     'Corrispettivo al consumo',
+     'Corrispettivo Variabile'
+]
+
 data = []
 for offerta in root.iter('offerta'):
     if(offerta.find('DettaglioOfferta/TIPO_CLIENTE').text == "01"):
@@ -25,7 +34,7 @@ for offerta in root.iter('offerta'):
             nome = componente.find('NOME').text
             if nome == "Prezzo":
                 costoKw = f"{componente.find('IntervalloPrezzi/PREZZO').text} €/kWh"
-            if "Spread" in nome or nome == "PREZZO MATERIA PRIMA" or nome == "SPREAD" or nome == "Prezzo Componente Energia Elettricità" or nome == "Corrispettivo al consumo" or nome == "Corrispettivo Variabile":
+            if nome in nomiPrezzi:
                 for prezzo in componente.findall('IntervalloPrezzi'):
                     fascia = prezzo.find('FASCIA_COMPONENTE').text
                     costo = prezzo.find('PREZZO').text
@@ -45,10 +54,23 @@ for offerta in root.iter('offerta'):
 
 # Requires Dash 2.17.0 or later
 app.layout = [
-    html.H1(children='Offerte ultimo mese', style={'textAlign':'center'}),
-    dash_table.DataTable(
+    
+     html.H1(children='Offerte ultimo mese', style={'textAlign':'center','font-family': 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'}),
+     dash_table.DataTable(
         data=data,
         page_size=30,
+        id='offerte',
+        columns=[
+                  {"name": "Azienda", 'id': "Azienda" },
+                  {"name": "Nome Offerta", 'id': "Nome Offerta" },
+                  {"name": "Durata", 'id': "Durata" },
+                  {"name": "URL", 'id': "URL" },
+                  {"name": "Data Inizio", 'id': "Data Inizio" },
+                  {"name": "Data Fine", 'id': "Data Fine" },
+                  {"name": "Costo kW", 'id': "Costo kW" },
+                  {"name": "Costo Energia Verde", 'id': "Costo Energia Verde" },
+            
+        ],
         style_cell = {'text-align' : 'left'},
         style_header={
             'backgroundColor': 'rgb(30, 30, 30)',
@@ -58,6 +80,7 @@ app.layout = [
             'backgroundColor': 'rgb(50, 50, 50)',
             'color': 'white'
         },
+        filter_action='native',
                         
     )
                             
